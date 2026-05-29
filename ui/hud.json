@@ -1,0 +1,482 @@
+{
+  "element": {
+    "type": "container",
+    "sourceTag": "div",
+    "children": [
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "SCORE"
+            ],
+            "properties": {
+              "class": "hud-label"
+            },
+            "dataUid": "uid-3"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "0"
+            ],
+            "properties": {
+              "id": "hud-score",
+              "class": "hud-value"
+            },
+            "dataUid": "uid-4"
+          }
+        ],
+        "properties": {
+          "class": "hud-col"
+        },
+        "dataUid": "uid-2"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "COMBO"
+            ],
+            "properties": {
+              "class": "hud-label"
+            },
+            "dataUid": "uid-6"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "x1"
+            ],
+            "properties": {
+              "id": "hud-combo",
+              "class": "hud-combo"
+            },
+            "dataUid": "uid-7"
+          }
+        ],
+        "properties": {
+          "class": "hud-col"
+        },
+        "dataUid": "uid-5"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "BEST HIT"
+            ],
+            "properties": {
+              "class": "hud-label"
+            },
+            "dataUid": "uid-9"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "0m"
+            ],
+            "properties": {
+              "id": "hud-distance",
+              "class": "hud-distance"
+            },
+            "dataUid": "uid-10"
+          }
+        ],
+        "properties": {
+          "class": "hud-col"
+        },
+        "dataUid": "uid-8"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "PITCHES"
+            ],
+            "properties": {
+              "class": "hud-label"
+            },
+            "dataUid": "uid-12"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "0/10"
+            ],
+            "properties": {
+              "id": "hud-pitches",
+              "class": "hud-pitches"
+            },
+            "dataUid": "uid-13"
+          }
+        ],
+        "properties": {
+          "class": "hud-col"
+        },
+        "dataUid": "uid-11"
+      },
+      {
+        "type": "container",
+        "sourceTag": "div",
+        "children": [
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [
+              "POWER-UP"
+            ],
+            "properties": {
+              "class": "hud-label"
+            },
+            "dataUid": "uid-15"
+          },
+          {
+            "sourceTag": "span",
+            "type": "custom",
+            "children": [],
+            "properties": {
+              "id": "hud-powerup",
+              "class": "hud-powerup"
+            },
+            "dataUid": "uid-16"
+          }
+        ],
+        "properties": {
+          "class": "hud-col"
+        },
+        "dataUid": "uid-14"
+      }
+    ],
+    "properties": {
+      "class": "hud-panel"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {
+    "hud-panel": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "row",
+        "gap": "3",
+        "paddingTop": "1",
+        "paddingBottom": "1",
+        "paddingLeft": "2",
+        "paddingRight": "2",
+        "backgroundColor": "rgba(0, 0, 0, 0.7)",
+        "borderColor": "#00ffff",
+        "borderWidth": "0.08",
+        "borderRadius": 1
+      }
+    },
+    "hud-col": {
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "alignItems": "center"
+      }
+    },
+    "hud-label": {
+      "content": {
+        "fontSize": "1.2",
+        "color": "#a0a0a0"
+      }
+    },
+    "hud-value": {
+      "content": {
+        "fontSize": "2.5",
+        "color": "#00ffff",
+        "fontWeight": "bold"
+      }
+    },
+    "hud-combo": {
+      "content": {
+        "fontSize": "2.5",
+        "color": "#ff00ff",
+        "fontWeight": "bold"
+      }
+    },
+    "hud-distance": {
+      "content": {
+        "fontSize": "2.5",
+        "color": "#ffd700",
+        "fontWeight": "bold"
+      }
+    },
+    "hud-pitches": {
+      "content": {
+        "fontSize": "2.5",
+        "color": "#00ff80",
+        "fontWeight": "bold"
+      }
+    },
+    "hud-powerup": {
+      "content": {
+        "fontSize": "1.8",
+        "color": "#ff4400",
+        "fontWeight": "bold"
+      }
+    }
+  },
+  "ranges": {
+    "hud-panel": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 1,
+        "column": 12
+      }
+    },
+    "hud-col": {
+      "start": {
+        "line": 14,
+        "column": 2
+      },
+      "end": {
+        "line": 14,
+        "column": 10
+      }
+    },
+    "hud-label": {
+      "start": {
+        "line": 19,
+        "column": 2
+      },
+      "end": {
+        "line": 19,
+        "column": 12
+      }
+    },
+    "hud-value": {
+      "start": {
+        "line": 23,
+        "column": 2
+      },
+      "end": {
+        "line": 23,
+        "column": 12
+      }
+    },
+    "hud-combo": {
+      "start": {
+        "line": 28,
+        "column": 2
+      },
+      "end": {
+        "line": 28,
+        "column": 12
+      }
+    },
+    "hud-distance": {
+      "start": {
+        "line": 33,
+        "column": 2
+      },
+      "end": {
+        "line": 33,
+        "column": 15
+      }
+    },
+    "hud-pitches": {
+      "start": {
+        "line": 38,
+        "column": 2
+      },
+      "end": {
+        "line": 38,
+        "column": 14
+      }
+    },
+    "hud-powerup": {
+      "start": {
+        "line": 43,
+        "column": 2
+      },
+      "end": {
+        "line": 43,
+        "column": 14
+      }
+    },
+    "uid-1": {
+      "start": {
+        "line": 49,
+        "column": 0
+      },
+      "end": {
+        "line": 70,
+        "column": 6
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 50,
+        "column": 2
+      },
+      "end": {
+        "line": 53,
+        "column": 8
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 51,
+        "column": 4
+      },
+      "end": {
+        "line": 51,
+        "column": 40
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 52,
+        "column": 4
+      },
+      "end": {
+        "line": 52,
+        "column": 51
+      }
+    },
+    "uid-5": {
+      "start": {
+        "line": 54,
+        "column": 2
+      },
+      "end": {
+        "line": 57,
+        "column": 8
+      }
+    },
+    "uid-6": {
+      "start": {
+        "line": 55,
+        "column": 4
+      },
+      "end": {
+        "line": 55,
+        "column": 40
+      }
+    },
+    "uid-7": {
+      "start": {
+        "line": 56,
+        "column": 4
+      },
+      "end": {
+        "line": 56,
+        "column": 52
+      }
+    },
+    "uid-8": {
+      "start": {
+        "line": 58,
+        "column": 2
+      },
+      "end": {
+        "line": 61,
+        "column": 8
+      }
+    },
+    "uid-9": {
+      "start": {
+        "line": 59,
+        "column": 4
+      },
+      "end": {
+        "line": 59,
+        "column": 43
+      }
+    },
+    "uid-10": {
+      "start": {
+        "line": 60,
+        "column": 4
+      },
+      "end": {
+        "line": 60,
+        "column": 58
+      }
+    },
+    "uid-11": {
+      "start": {
+        "line": 62,
+        "column": 2
+      },
+      "end": {
+        "line": 65,
+        "column": 8
+      }
+    },
+    "uid-12": {
+      "start": {
+        "line": 63,
+        "column": 4
+      },
+      "end": {
+        "line": 63,
+        "column": 42
+      }
+    },
+    "uid-13": {
+      "start": {
+        "line": 64,
+        "column": 4
+      },
+      "end": {
+        "line": 64,
+        "column": 58
+      }
+    },
+    "uid-14": {
+      "start": {
+        "line": 66,
+        "column": 2
+      },
+      "end": {
+        "line": 69,
+        "column": 8
+      }
+    },
+    "uid-15": {
+      "start": {
+        "line": 67,
+        "column": 4
+      },
+      "end": {
+        "line": 67,
+        "column": 43
+      }
+    },
+    "uid-16": {
+      "start": {
+        "line": 68,
+        "column": 4
+      },
+      "end": {
+        "line": 68,
+        "column": 54
+      }
+    }
+  }
+}

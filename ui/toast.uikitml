@@ -1,0 +1,28 @@
+<style>
+  .toast-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1;
+    padding-bottom: 1;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-color: #ffd700;
+    border-width: 0.1;
+    border-radius: 1;
+  }
+  .toast-text {
+    font-size: 3;
+    color: #ffd700;
+    font-weight: bold;
+  }
+  .toast-sub {
+    font-size: 1.5;
+    color: #ffffff;
+  }
+</style>
+<div class="toast-panel">
+  <span id="toast-text" class="toast-text">HOME RUN!</span>
+  <span id="toast-sub" class="toast-sub">105m</span>
+</div>

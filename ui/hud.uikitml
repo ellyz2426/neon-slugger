@@ -1,0 +1,62 @@
+<style>
+  .hud-panel {
+    display: flex;
+    flex-direction: row;
+    gap: 3;
+    padding-top: 1;
+    padding-bottom: 1;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-color: #00ffff;
+    border-width: 0.08;
+    border-radius: 1;
+  }
+  .hud-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .hud-label {
+    font-size: 1.2;
+    color: #a0a0a0;
+  }
+  .hud-value {
+    font-size: 2.5;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .hud-combo {
+    font-size: 2.5;
+    color: #ff00ff;
+    font-weight: bold;
+  }
+  .hud-distance {
+    font-size: 2.5;
+    color: #ffd700;
+    font-weight: bold;
+  }
+  .hud-pitches {
+    font-size: 2.5;
+    color: #00ff80;
+    font-weight: bold;
+  }
+</style>
+<div class="hud-panel">
+  <div class="hud-col">
+    <span class="hud-label">SCORE</span>
+    <span id="hud-score" class="hud-value">0</span>
+  </div>
+  <div class="hud-col">
+    <span class="hud-label">COMBO</span>
+    <span id="hud-combo" class="hud-combo">x1</span>
+  </div>
+  <div class="hud-col">
+    <span class="hud-label">BEST HIT</span>
+    <span id="hud-distance" class="hud-distance">0m</span>
+  </div>
+  <div class="hud-col">
+    <span class="hud-label">PITCHES</span>
+    <span id="hud-pitches" class="hud-pitches">0/10</span>
+  </div>
+</div>

@@ -1,0 +1,73 @@
+<style>
+  .title-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 4;
+    padding-bottom: 4;
+    padding-left: 6;
+    padding-right: 6;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-color: #00ffff;
+    border-width: 0.15;
+    border-radius: 2;
+  }
+  .title-text {
+    font-size: 5;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .subtitle {
+    font-size: 2;
+    color: #ff00ff;
+    margin-top: 1;
+  }
+  .btn-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1;
+    margin-top: 3;
+    width: 100%;
+    align-items: center;
+  }
+  .btn {
+    padding-top: 1;
+    padding-bottom: 1;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 255, 255, 0.15);
+    border-color: #00ffff;
+    border-width: 0.08;
+    border-radius: 1;
+    cursor: pointer;
+  }
+  .btn-text {
+    font-size: 2.2;
+    color: #ffffff;
+    font-weight: bold;
+  }
+  .btn-gold {
+    background-color: rgba(255, 215, 0, 0.15);
+    border-color: #ffd700;
+  }
+  .btn-green {
+    background-color: rgba(0, 255, 128, 0.15);
+    border-color: #00ff80;
+  }
+</style>
+<div class="title-panel">
+  <span class="title-text">NEON SLUGGER</span>
+  <span class="subtitle">HOLODECK BATTING CAGE</span>
+  <div class="btn-row">
+    <div id="btn-play" class="btn" cursor="pointer"><span class="btn-text">PLAY</span></div>
+    <div id="btn-derby" class="btn" cursor="pointer"><span class="btn-text">HOME RUN DERBY</span></div>
+    <div id="btn-speed" class="btn" cursor="pointer"><span class="btn-text">SPEED BATTING</span></div>
+    <div id="btn-streak" class="btn" cursor="pointer"><span class="btn-text">STREAK CHALLENGE</span></div>
+    <div id="btn-daily" class="btn btn-gold" cursor="pointer"><span class="btn-text">DAILY CHALLENGE</span></div>
+    <div id="btn-practice" class="btn btn-green" cursor="pointer"><span class="btn-text">PRACTICE</span></div>
+    <div id="btn-leaderboard" class="btn" cursor="pointer"><span class="btn-text">LEADERBOARD</span></div>
+    <div id="btn-achievements" class="btn" cursor="pointer"><span class="btn-text">ACHIEVEMENTS</span></div>
+    <div id="btn-settings" class="btn" cursor="pointer"><span class="btn-text">SETTINGS</span></div>
+    <div id="btn-help" class="btn" cursor="pointer"><span class="btn-text">HELP</span></div>
+  </div>
+</div>

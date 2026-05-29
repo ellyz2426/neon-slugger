@@ -1,0 +1,76 @@
+<style>
+  .diff-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 3;
+    padding-bottom: 3;
+    padding-left: 5;
+    padding-right: 5;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-color: #00ffff;
+    border-width: 0.12;
+    border-radius: 2;
+  }
+  .diff-title {
+    font-size: 3.5;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .diff-sub {
+    font-size: 1.8;
+    color: #a0a0a0;
+    margin-top: 1;
+  }
+  .btn-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1;
+    margin-top: 2;
+    width: 100%;
+    align-items: center;
+  }
+  .btn {
+    padding-top: 1;
+    padding-bottom: 1;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(0, 255, 255, 0.15);
+    border-color: #00ffff;
+    border-width: 0.08;
+    border-radius: 1;
+    cursor: pointer;
+  }
+  .btn-text {
+    font-size: 2;
+    color: #ffffff;
+    font-weight: bold;
+  }
+  .btn-easy {
+    background-color: rgba(0, 255, 128, 0.15);
+    border-color: #00ff80;
+  }
+  .btn-medium {
+    background-color: rgba(255, 165, 0, 0.15);
+    border-color: #ffa500;
+  }
+  .btn-hard {
+    background-color: rgba(255, 0, 64, 0.15);
+    border-color: #ff0040;
+  }
+  .btn-back {
+    background-color: rgba(128, 128, 128, 0.15);
+    border-color: #808080;
+    margin-top: 1;
+  }
+</style>
+<div class="diff-panel">
+  <span class="diff-title">SELECT DIFFICULTY</span>
+  <span class="diff-sub">Choose your challenge level</span>
+  <div class="btn-row">
+    <div id="btn-easy" class="btn btn-easy" cursor="pointer"><span class="btn-text">EASY - Slow Pitches</span></div>
+    <div id="btn-medium" class="btn btn-medium" cursor="pointer"><span class="btn-text">MEDIUM - Mixed Speeds</span></div>
+    <div id="btn-hard" class="btn btn-hard" cursor="pointer"><span class="btn-text">HARD - Fast + Curves</span></div>
+    <div id="btn-diff-back" class="btn btn-back" cursor="pointer"><span class="btn-text">BACK</span></div>
+  </div>
+</div>

@@ -1,0 +1,4 @@
+node_modules/
+.iwsdk/
+.mcp.json
+*.log

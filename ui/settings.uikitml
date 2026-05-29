@@ -1,0 +1,115 @@
+<style>
+  .settings-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 3;
+    padding-bottom: 3;
+    padding-left: 5;
+    padding-right: 5;
+    background-color: rgba(0, 0, 0, 0.92);
+    border-color: #00ffff;
+    border-width: 0.12;
+    border-radius: 2;
+  }
+  .settings-title {
+    font-size: 3.5;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .vol-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1;
+    margin-top: 1;
+    align-items: center;
+  }
+  .vol-label {
+    font-size: 1.8;
+    color: #a0a0a0;
+    width: 40%;
+  }
+  .vol-btn {
+    padding-top: 0.5;
+    padding-bottom: 0.5;
+    padding-left: 1;
+    padding-right: 1;
+    background-color: rgba(0, 255, 255, 0.2);
+    border-color: #00ffff;
+    border-width: 0.06;
+    border-radius: 0.5;
+    cursor: pointer;
+  }
+  .vol-btn-text {
+    font-size: 1.8;
+    color: #00ffff;
+    font-weight: bold;
+  }
+  .vol-value {
+    font-size: 1.8;
+    color: #ffffff;
+    font-weight: bold;
+    width: 15%;
+  }
+  .theme-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1;
+    margin-top: 1.5;
+    align-items: center;
+  }
+  .theme-label {
+    font-size: 1.8;
+    color: #a0a0a0;
+  }
+  .theme-value {
+    font-size: 1.8;
+    color: #ffd700;
+    font-weight: bold;
+  }
+  .btn {
+    padding-top: 1;
+    padding-bottom: 1;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(128, 128, 128, 0.15);
+    border-color: #808080;
+    border-width: 0.08;
+    border-radius: 1;
+    cursor: pointer;
+    margin-top: 2;
+  }
+  .btn-text {
+    font-size: 2;
+    color: #ffffff;
+    font-weight: bold;
+  }
+</style>
+<div class="settings-panel">
+  <span class="settings-title">SETTINGS</span>
+  <div class="vol-row">
+    <span class="vol-label">MASTER</span>
+    <div id="btn-master-down" class="vol-btn" cursor="pointer"><span class="vol-btn-text">-</span></div>
+    <span id="vol-master" class="vol-value">100</span>
+    <div id="btn-master-up" class="vol-btn" cursor="pointer"><span class="vol-btn-text">+</span></div>
+  </div>
+  <div class="vol-row">
+    <span class="vol-label">SFX</span>
+    <div id="btn-sfx-down" class="vol-btn" cursor="pointer"><span class="vol-btn-text">-</span></div>
+    <span id="vol-sfx" class="vol-value">100</span>
+    <div id="btn-sfx-up" class="vol-btn" cursor="pointer"><span class="vol-btn-text">+</span></div>
+  </div>
+  <div class="vol-row">
+    <span class="vol-label">MUSIC</span>
+    <div id="btn-music-down" class="vol-btn" cursor="pointer"><span class="vol-btn-text">-</span></div>
+    <span id="vol-music" class="vol-value">100</span>
+    <div id="btn-music-up" class="vol-btn" cursor="pointer"><span class="vol-btn-text">+</span></div>
+  </div>
+  <div class="theme-row">
+    <div id="btn-theme-prev" class="vol-btn" cursor="pointer"><span class="vol-btn-text">&lt;</span></div>
+    <span class="theme-label">THEME: </span>
+    <span id="theme-name" class="theme-value">Holodeck</span>
+    <div id="btn-theme-next" class="vol-btn" cursor="pointer"><span class="vol-btn-text">&gt;</span></div>
+  </div>
+  <div id="btn-settings-back" class="btn" cursor="pointer"><span class="btn-text">BACK</span></div>
+</div>

@@ -1,0 +1,77 @@
+<style>
+  .ach-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 3;
+    padding-bottom: 3;
+    padding-left: 4;
+    padding-right: 4;
+    background-color: rgba(0, 0, 0, 0.92);
+    border-color: #ff00ff;
+    border-width: 0.12;
+    border-radius: 2;
+  }
+  .ach-title {
+    font-size: 3.5;
+    color: #ff00ff;
+    font-weight: bold;
+  }
+  .ach-count {
+    font-size: 1.8;
+    color: #a0a0a0;
+    margin-top: 0.5;
+  }
+  .ach-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1;
+    margin-top: 0.5;
+    width: 100%;
+  }
+  .ach-name { font-size: 1.3; color: #ff00ff; width: 50%; }
+  .ach-desc { font-size: 1.3; color: #a0a0a0; width: 40%; }
+  .ach-status { font-size: 1.3; color: #00ff80; width: 10%; }
+  .btn {
+    padding-top: 1;
+    padding-bottom: 1;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(128, 128, 128, 0.15);
+    border-color: #808080;
+    border-width: 0.08;
+    border-radius: 1;
+    cursor: pointer;
+    margin-top: 2;
+  }
+  .btn-text {
+    font-size: 2;
+    color: #ffffff;
+    font-weight: bold;
+  }
+</style>
+<div class="ach-panel">
+  <span class="ach-title">ACHIEVEMENTS</span>
+  <span id="ach-count" class="ach-count">0 / 20</span>
+  <div id="ach-1" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-2" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-3" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-4" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-5" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-6" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-7" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-8" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-9" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-10" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-11" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-12" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-13" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-14" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-15" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-16" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-17" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-18" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-19" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="ach-20" class="ach-row"><span class="ach-name">---</span><span class="ach-desc">---</span><span class="ach-status">-</span></div>
+  <div id="btn-ach-back" class="btn" cursor="pointer"><span class="btn-text">BACK</span></div>
+</div>

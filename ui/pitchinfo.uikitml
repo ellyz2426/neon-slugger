@@ -1,0 +1,33 @@
+<style>
+  .pitch-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 0.8;
+    padding-bottom: 0.8;
+    padding-left: 2;
+    padding-right: 2;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-color: #ff00ff;
+    border-width: 0.06;
+    border-radius: 0.8;
+  }
+  .pitch-label {
+    font-size: 1.2;
+    color: #a0a0a0;
+  }
+  .pitch-type {
+    font-size: 2;
+    color: #ff00ff;
+    font-weight: bold;
+  }
+  .pitch-speed {
+    font-size: 1.5;
+    color: #00ffff;
+  }
+</style>
+<div class="pitch-panel">
+  <span class="pitch-label">INCOMING</span>
+  <span id="pitch-type" class="pitch-type">FASTBALL</span>
+  <span id="pitch-speed" class="pitch-speed">95 MPH</span>
+</div>

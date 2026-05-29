@@ -1,0 +1,79 @@
+<style>
+  .help-panel {
+    display: flex;
+    flex-direction: column;
+    padding-top: 3;
+    padding-bottom: 3;
+    padding-left: 4;
+    padding-right: 4;
+    background-color: rgba(0, 0, 0, 0.92);
+    border-color: #00ff80;
+    border-width: 0.12;
+    border-radius: 2;
+  }
+  .help-title {
+    font-size: 3.5;
+    color: #00ff80;
+    font-weight: bold;
+  }
+  .help-section {
+    font-size: 2;
+    color: #00ffff;
+    font-weight: bold;
+    margin-top: 1.5;
+  }
+  .help-text {
+    font-size: 1.4;
+    color: #c0c0c0;
+    margin-top: 0.3;
+  }
+  .btn {
+    padding-top: 1;
+    padding-bottom: 1;
+    padding-left: 3;
+    padding-right: 3;
+    background-color: rgba(128, 128, 128, 0.15);
+    border-color: #808080;
+    border-width: 0.08;
+    border-radius: 1;
+    cursor: pointer;
+    margin-top: 2;
+    align-self: center;
+  }
+  .btn-text {
+    font-size: 2;
+    color: #ffffff;
+    font-weight: bold;
+  }
+</style>
+<div class="help-panel">
+  <span class="help-title">HOW TO PLAY</span>
+  <span class="help-section">BROWSER CONTROLS</span>
+  <span class="help-text">Click and hold to charge swing power</span>
+  <span class="help-text">Move mouse left/right to aim</span>
+  <span class="help-text">Release to swing bat</span>
+  <span class="help-text">ESC to pause</span>
+  <span class="help-section">VR CONTROLS</span>
+  <span class="help-text">Right trigger: charge and release to swing</span>
+  <span class="help-text">Aim with controller direction</span>
+  <span class="help-text">B button: pause</span>
+  <span class="help-section">PITCH TYPES</span>
+  <span class="help-text">FASTBALL (cyan) - Straight and fast</span>
+  <span class="help-text">CURVEBALL (green) - Dips down sharply</span>
+  <span class="help-text">SLIDER (orange) - Breaks sideways</span>
+  <span class="help-text">CHANGEUP (magenta) - Slow and deceiving</span>
+  <span class="help-text">KNUCKLEBALL (white) - Unpredictable wobble</span>
+  <span class="help-section">SCORING</span>
+  <span class="help-text">Foul: 25pts | Single: 100pts | Double: 200pts</span>
+  <span class="help-text">Triple: 400pts | Home Run: 1000pts</span>
+  <span class="help-text">Grand Slam (120m+): 2000pts</span>
+  <span class="help-text">Combo multiplier builds on consecutive hits</span>
+  <span class="help-section">GAME MODES</span>
+  <span class="help-text">Classic: 10 pitches per round, 3 rounds</span>
+  <span class="help-text">Home Run Derby: 10 pitches, only HRs count</span>
+  <span class="help-text">Speed Batting: 60 seconds, unlimited pitches</span>
+  <span class="help-text">Streak: Hit consecutive pitches, 3 misses out</span>
+  <span class="help-text">Daily Challenge: Seeded daily sequence</span>
+  <span class="help-text">Practice: Unlimited, no scoring pressure</span>
+  <div id="btn-help-back" class="btn" cursor="pointer"><span class="btn-text">BACK</span></div>
+</div>

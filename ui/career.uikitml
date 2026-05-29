@@ -1,0 +1,54 @@
+<panel background="#000a1aee" borderRadius={16} padding={24} gap={12}>
+  <text fontSize={24} fontWeight="bold" color="#00ffff">CAREER STATS</text>
+
+  <panel background="#001a2a88" borderRadius={8} padding={14} gap={8}>
+    <panel flexDirection="row" justifyContent="space-between" gap={8}>
+      <text fontSize={13} color="#88aaaa">Games Played</text>
+      <text id="career-games" fontSize={13} fontWeight="bold" color="#00ffff">0</text>
+    </panel>
+    <panel flexDirection="row" justifyContent="space-between" gap={8}>
+      <text fontSize={13} color="#88aaaa">Total Hits</text>
+      <text id="career-hits" fontSize={13} fontWeight="bold" color="#00ff80">0</text>
+    </panel>
+    <panel flexDirection="row" justifyContent="space-between" gap={8}>
+      <text fontSize={13} color="#88aaaa">Home Runs</text>
+      <text id="career-hrs" fontSize={13} fontWeight="bold" color="#ffd700">0</text>
+    </panel>
+    <panel flexDirection="row" justifyContent="space-between" gap={8}>
+      <text fontSize={13} color="#88aaaa">Grand Slams</text>
+      <text id="career-slams" fontSize={13} fontWeight="bold" color="#ff4444">0</text>
+    </panel>
+    <panel flexDirection="row" justifyContent="space-between" gap={8}>
+      <text fontSize={13} color="#88aaaa">Total Distance</text>
+      <text id="career-distance" fontSize={13} fontWeight="bold" color="#00ffff">0m</text>
+    </panel>
+  </panel>
+
+  <panel background="#001a2a88" borderRadius={8} padding={14} gap={8}>
+    <text fontSize={15} fontWeight="bold" color="#ff00ff">PERSONAL BESTS</text>
+    <panel flexDirection="row" justifyContent="space-between" gap={8}>
+      <text fontSize={13} color="#88aaaa">Best Score</text>
+      <text id="career-best-score" fontSize={13} fontWeight="bold" color="#ffd700">0</text>
+    </panel>
+    <panel flexDirection="row" justifyContent="space-between" gap={8}>
+      <text fontSize={13} color="#88aaaa">Best Combo</text>
+      <text id="career-best-combo" fontSize={13} fontWeight="bold" color="#ff00ff">0</text>
+    </panel>
+    <panel flexDirection="row" justifyContent="space-between" gap={8}>
+      <text fontSize={13} color="#88aaaa">Longest Hit</text>
+      <text id="career-best-dist" fontSize={13} fontWeight="bold" color="#00ffff">0m</text>
+    </panel>
+    <panel flexDirection="row" justifyContent="space-between" gap={8}>
+      <text fontSize={13} color="#88aaaa">Power-ups Collected</text>
+      <text id="career-powerups" fontSize={13} fontWeight="bold" color="#ff4400">0</text>
+    </panel>
+    <panel flexDirection="row" justifyContent="space-between" gap={8}>
+      <text fontSize={13} color="#88aaaa">Perfect Rounds</text>
+      <text id="career-perfects" fontSize={13} fontWeight="bold" color="#00ff80">0</text>
+    </panel>
+  </panel>
+
+  <panel id="btn-career-back" background="#222244" borderRadius={8} padding={8} paddingLeft={24} paddingRight={24}>
+    <text fontSize={14} color="#88aaaa">BACK</text>
+  </panel>
+</panel>

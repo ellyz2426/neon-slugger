@@ -2,7 +2,7 @@
 import { Color, Vector3 } from '@iwsdk/core';
 
 // --- Game States ---
-export type GameState = 'title' | 'difficulty' | 'countdown' | 'playing' | 'paused' | 'gameover' | 'leaderboard' | 'achievements' | 'settings' | 'help';
+export type GameState = 'title' | 'difficulty' | 'countdown' | 'playing' | 'paused' | 'gameover' | 'leaderboard' | 'achievements' | 'settings' | 'help' | 'tutorial' | 'batskins' | 'career';
 export type GameMode = 'classic' | 'derby' | 'speed' | 'streak' | 'daily' | 'practice';
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -88,6 +88,70 @@ export const HIT_COLORS: Record<HitResult, Color> = {
   grandslam: new Color(0xff4444),
 };
 
+// --- Bat Skins ---
+export interface BatSkin {
+  id: string;
+  name: string;
+  handleColor: number;
+  barrelColor: number;
+  glowColor: number;
+  emissiveIntensity: number;
+  requiresAchievement?: string; // locked until this achievement is unlocked
+}
+
+export const BAT_SKINS: BatSkin[] = [
+  { id: 'default', name: 'Neon Cyan', handleColor: 0x443322, barrelColor: 0x00ffff, glowColor: 0x00ffff, emissiveIntensity: 0.4 },
+  { id: 'magenta', name: 'Magenta Storm', handleColor: 0x332233, barrelColor: 0xff00ff, glowColor: 0xff00ff, emissiveIntensity: 0.4 },
+  { id: 'solar', name: 'Solar Flare', handleColor: 0x443311, barrelColor: 0xffa500, glowColor: 0xffcc00, emissiveIntensity: 0.5 },
+  { id: 'toxic', name: 'Toxic Green', handleColor: 0x224422, barrelColor: 0x00ff40, glowColor: 0x80ff00, emissiveIntensity: 0.45 },
+  { id: 'crimson', name: 'Crimson Edge', handleColor: 0x442222, barrelColor: 0xff2020, glowColor: 0xff4040, emissiveIntensity: 0.5 },
+  { id: 'gold', name: 'Golden Slugger', handleColor: 0x444422, barrelColor: 0xffd700, glowColor: 0xffee44, emissiveIntensity: 0.6, requiresAchievement: 'first_hr' },
+  { id: 'phantom', name: 'Phantom White', handleColor: 0x333344, barrelColor: 0xccccff, glowColor: 0xffffff, emissiveIntensity: 0.35, requiresAchievement: 'streak_20' },
+  { id: 'plasma', name: 'Plasma Inferno', handleColor: 0x331111, barrelColor: 0xff4400, glowColor: 0xff8800, emissiveIntensity: 0.7, requiresAchievement: 'score_10k' },
+];
+
+// --- Power-ups ---
+export type PowerUpType = 'power_swing' | 'time_freeze' | 'magnet';
+
+export interface PowerUpConfig {
+  name: string;
+  desc: string;
+  color: Color;
+  duration: number; // seconds (0 = single use)
+  icon: string;
+}
+
+export const POWERUP_CONFIGS: Record<PowerUpType, PowerUpConfig> = {
+  power_swing: { name: 'POWER SWING', desc: '2x hit distance', color: new Color(0xff4400), duration: 0, icon: '⚡' },
+  time_freeze: { name: 'TIME FREEZE', desc: 'Next pitch at 0.3x speed', color: new Color(0x4488ff), duration: 0, icon: '❄' },
+  magnet: { name: 'MAGNET', desc: 'Ball curves toward bat', color: new Color(0xff00ff), duration: 8, icon: '🧲' },
+};
+
+export const POWERUP_TYPES: PowerUpType[] = ['power_swing', 'time_freeze', 'magnet'];
+
+// --- Career Stats ---
+export interface CareerStats {
+  gamesPlayed: number;
+  totalHits: number;
+  totalHomeRuns: number;
+  totalGrandSlams: number;
+  totalDistance: number;
+  bestScore: number;
+  bestCombo: number;
+  bestDistance: number;
+  totalPitchesFaced: number;
+  powerUpsCollected: number;
+  perfectRounds: number;
+}
+
+export function emptyCareerStats(): CareerStats {
+  return {
+    gamesPlayed: 0, totalHits: 0, totalHomeRuns: 0, totalGrandSlams: 0,
+    totalDistance: 0, bestScore: 0, bestCombo: 0, bestDistance: 0,
+    totalPitchesFaced: 0, powerUpsCollected: 0, perfectRounds: 0,
+  };
+}
+
 // --- Themes ---
 export interface Theme {
   name: string;
@@ -115,6 +179,7 @@ export interface Achievement {
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
+  // Original 20
   { id: 'first_hit', name: 'First Contact', desc: 'Hit your first pitch' },
   { id: 'first_hr', name: 'Going Yard', desc: 'Hit your first home run' },
   { id: 'grand_slam', name: 'Grand Slam', desc: 'Hit a ball 120m+' },
@@ -135,6 +200,17 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'accuracy_90', name: 'Sharpshooter', desc: '90%+ accuracy in a game' },
   { id: 'distance_150', name: 'Moon Shot', desc: 'Hit a ball 150m+' },
   { id: 'all_modes', name: 'Versatile', desc: 'Play every game mode' },
+  // Round 2 — 10 new achievements
+  { id: 'powerup_first', name: 'Power Up!', desc: 'Collect your first power-up' },
+  { id: 'powerup_10', name: 'Charged Up', desc: 'Collect 10 power-ups total' },
+  { id: 'career_100_hits', name: 'Century Slugger', desc: 'Reach 100 career hits' },
+  { id: 'career_50_hr', name: 'Homer Legend', desc: 'Reach 50 career home runs' },
+  { id: 'career_1000_dist', name: 'Distance King', desc: 'Hit 1,000m total career distance' },
+  { id: 'skin_unlock', name: 'Fashionista', desc: 'Unlock an achievement-locked bat skin' },
+  { id: 'triple_play', name: 'Triple Threat', desc: 'Hit 3 triples in one game' },
+  { id: 'games_10', name: 'Regular', desc: 'Play 10 games total' },
+  { id: 'games_50', name: 'Veteran', desc: 'Play 50 games total' },
+  { id: 'perfect_3', name: 'Perfect Streak', desc: 'Get 3 perfect rounds in career' },
 ];
 
 // --- Game State Manager ---
@@ -148,7 +224,10 @@ export class GameStateManager {
   hits = 0;
   misses = 0;
   homeRuns = 0;
+  grandSlams = 0;
+  triples = 0;
   bestDistance = 0;
+  totalDistanceThisGame = 0;
   pitchesThrown = 0;
   pitchesRemaining = 0;
   timeRemaining = 0;
@@ -159,10 +238,22 @@ export class GameStateManager {
   knucklesHit = 0;
   modesPlayed = new Set<GameMode>();
 
+  // Bat skin
+  batSkinIndex = 0;
+
+  // Power-ups
+  activePowerUp: PowerUpType | null = null;
+  powerUpTimer = 0;
+  powerUpsCollectedThisGame = 0;
+
   // Leaderboard
   leaderboard: { score: number; mode: string; date: string; accuracy: number }[] = [];
   // Achievements
   unlockedAchievements = new Set<string>();
+  // Career
+  career: CareerStats = emptyCareerStats();
+  // Tutorial shown
+  tutorialShown = false;
 
   constructor() {
     this.loadPersistence();
@@ -176,6 +267,12 @@ export class GameStateManager {
       if (ach) this.unlockedAchievements = new Set(JSON.parse(ach));
       const mp = localStorage.getItem('ns_modes_played');
       if (mp) this.modesPlayed = new Set(JSON.parse(mp));
+      const cs = localStorage.getItem('ns_career');
+      if (cs) this.career = { ...emptyCareerStats(), ...JSON.parse(cs) };
+      const bs = localStorage.getItem('ns_bat_skin');
+      if (bs) this.batSkinIndex = parseInt(bs, 10) || 0;
+      const ts = localStorage.getItem('ns_tutorial_shown');
+      if (ts) this.tutorialShown = ts === 'true';
     } catch { /* ignore */ }
   }
 
@@ -184,6 +281,9 @@ export class GameStateManager {
       localStorage.setItem('ns_leaderboard', JSON.stringify(this.leaderboard));
       localStorage.setItem('ns_achievements', JSON.stringify([...this.unlockedAchievements]));
       localStorage.setItem('ns_modes_played', JSON.stringify([...this.modesPlayed]));
+      localStorage.setItem('ns_career', JSON.stringify(this.career));
+      localStorage.setItem('ns_bat_skin', String(this.batSkinIndex));
+      localStorage.setItem('ns_tutorial_shown', String(this.tutorialShown));
     } catch { /* ignore */ }
   }
 
@@ -194,11 +294,17 @@ export class GameStateManager {
     this.hits = 0;
     this.misses = 0;
     this.homeRuns = 0;
+    this.grandSlams = 0;
+    this.triples = 0;
     this.bestDistance = 0;
+    this.totalDistanceThisGame = 0;
     this.pitchesThrown = 0;
     this.curvesHit = 0;
     this.knucklesHit = 0;
     this.round = 1;
+    this.activePowerUp = null;
+    this.powerUpTimer = 0;
+    this.powerUpsCollectedThisGame = 0;
 
     switch (this.mode) {
       case 'classic':
@@ -235,6 +341,21 @@ export class GameStateManager {
     }
   }
 
+  updateCareerOnGameEnd(): void {
+    this.career.gamesPlayed++;
+    this.career.totalHits += this.hits;
+    this.career.totalHomeRuns += this.homeRuns;
+    this.career.totalGrandSlams += this.grandSlams;
+    this.career.totalDistance += this.totalDistanceThisGame;
+    this.career.powerUpsCollected += this.powerUpsCollectedThisGame;
+    this.career.totalPitchesFaced += this.pitchesThrown;
+    if (this.score > this.career.bestScore) this.career.bestScore = this.score;
+    if (this.maxCombo > this.career.bestCombo) this.career.bestCombo = this.maxCombo;
+    if (this.bestDistance > this.career.bestDistance) this.career.bestDistance = this.bestDistance;
+    if (this.misses === 0 && this.pitchesThrown > 0) this.career.perfectRounds++;
+    this.savePersistence();
+  }
+
   addToLeaderboard(): void {
     const accuracy = this.pitchesThrown > 0 ? Math.round((this.hits / this.pitchesThrown) * 100) : 0;
     const entry = {
@@ -259,5 +380,10 @@ export class GameStateManager {
     if (this.combo >= 10) return 3;
     if (this.combo >= 5) return 2;
     return 1;
+  }
+
+  isBatSkinUnlocked(skin: BatSkin): boolean {
+    if (!skin.requiresAchievement) return true;
+    return this.unlockedAchievements.has(skin.requiresAchievement);
   }
 }

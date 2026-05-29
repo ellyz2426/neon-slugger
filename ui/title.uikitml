@@ -67,6 +67,8 @@
     <div id="btn-practice" class="btn btn-green" cursor="pointer"><span class="btn-text">PRACTICE</span></div>
     <div id="btn-leaderboard" class="btn" cursor="pointer"><span class="btn-text">LEADERBOARD</span></div>
     <div id="btn-achievements" class="btn" cursor="pointer"><span class="btn-text">ACHIEVEMENTS</span></div>
+    <div id="btn-batskins" class="btn" cursor="pointer"><span class="btn-text">BAT SKINS</span></div>
+    <div id="btn-career" class="btn" cursor="pointer"><span class="btn-text">CAREER STATS</span></div>
     <div id="btn-settings" class="btn" cursor="pointer"><span class="btn-text">SETTINGS</span></div>
     <div id="btn-help" class="btn" cursor="pointer"><span class="btn-text">HELP</span></div>
   </div>

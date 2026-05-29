@@ -221,7 +221,7 @@
                 "sourceTag": "span",
                 "type": "custom",
                 "children": [
-                  "SETTINGS"
+                  "BAT SKINS"
                 ],
                 "properties": {
                   "class": "btn-text"
@@ -230,11 +230,57 @@
               }
             ],
             "properties": {
-              "id": "btn-settings",
+              "id": "btn-batskins",
               "class": "btn",
               "cursor": "pointer"
             },
             "dataUid": "uid-21"
+          },
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "CAREER STATS"
+                ],
+                "properties": {
+                  "class": "btn-text"
+                },
+                "dataUid": "uid-24"
+              }
+            ],
+            "properties": {
+              "id": "btn-career",
+              "class": "btn",
+              "cursor": "pointer"
+            },
+            "dataUid": "uid-23"
+          },
+          {
+            "type": "container",
+            "sourceTag": "div",
+            "children": [
+              {
+                "sourceTag": "span",
+                "type": "custom",
+                "children": [
+                  "SETTINGS"
+                ],
+                "properties": {
+                  "class": "btn-text"
+                },
+                "dataUid": "uid-26"
+              }
+            ],
+            "properties": {
+              "id": "btn-settings",
+              "class": "btn",
+              "cursor": "pointer"
+            },
+            "dataUid": "uid-25"
           },
           {
             "type": "container",
@@ -249,7 +295,7 @@
                 "properties": {
                   "class": "btn-text"
                 },
-                "dataUid": "uid-24"
+                "dataUid": "uid-28"
               }
             ],
             "properties": {
@@ -257,7 +303,7 @@
               "class": "btn",
               "cursor": "pointer"
             },
-            "dataUid": "uid-23"
+            "dataUid": "uid-27"
           }
         ],
         "properties": {
@@ -431,7 +477,7 @@
         "column": 0
       },
       "end": {
-        "line": 72,
+        "line": 74,
         "column": 6
       }
     },
@@ -461,7 +507,7 @@
         "column": 2
       },
       "end": {
-        "line": 71,
+        "line": 73,
         "column": 8
       }
     },
@@ -632,7 +678,7 @@
       },
       "end": {
         "line": 69,
-        "column": 100
+        "column": 101
       }
     },
     "uid-22": {
@@ -642,7 +688,7 @@
       },
       "end": {
         "line": 69,
-        "column": 94
+        "column": 95
       }
     },
     "uid-23": {
@@ -652,16 +698,56 @@
       },
       "end": {
         "line": 70,
-        "column": 92
+        "column": 102
       }
     },
     "uid-24": {
       "start": {
         "line": 70,
-        "column": 52
+        "column": 54
       },
       "end": {
         "line": 70,
+        "column": 96
+      }
+    },
+    "uid-25": {
+      "start": {
+        "line": 71,
+        "column": 4
+      },
+      "end": {
+        "line": 71,
+        "column": 100
+      }
+    },
+    "uid-26": {
+      "start": {
+        "line": 71,
+        "column": 56
+      },
+      "end": {
+        "line": 71,
+        "column": 94
+      }
+    },
+    "uid-27": {
+      "start": {
+        "line": 72,
+        "column": 4
+      },
+      "end": {
+        "line": 72,
+        "column": 92
+      }
+    },
+    "uid-28": {
+      "start": {
+        "line": 72,
+        "column": 52
+      },
+      "end": {
+        "line": 72,
         "column": 86
       }
     }

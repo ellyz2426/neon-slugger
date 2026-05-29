@@ -1,0 +1,25 @@
+<panel background="#000a1aee" borderRadius={16} padding={24} gap={14}>
+  <text fontSize={24} fontWeight="bold" color="#00ffff">BAT SKINS</text>
+
+  <panel background="#001a2a88" borderRadius={8} padding={16} gap={10}>
+    <text id="skin-name" fontSize={20} fontWeight="bold" color="#ffd700">Neon Cyan</text>
+    <text id="skin-status" fontSize={14} color="#00ff80">UNLOCKED</text>
+    <text id="skin-index" fontSize={12} color="#88aaaa">1 / 8</text>
+  </panel>
+
+  <panel flexDirection="row" gap={12} justifyContent="center">
+    <panel id="btn-skin-prev" background="#333366" borderRadius={8} padding={10} paddingLeft={20} paddingRight={20}>
+      <text fontSize={16} fontWeight="bold" color="#00ffff">PREV</text>
+    </panel>
+    <panel id="btn-skin-select" background="#00ffff" borderRadius={8} padding={10} paddingLeft={20} paddingRight={20}>
+      <text fontSize={16} fontWeight="bold" color="#000000">EQUIP</text>
+    </panel>
+    <panel id="btn-skin-next" background="#333366" borderRadius={8} padding={10} paddingLeft={20} paddingRight={20}>
+      <text fontSize={16} fontWeight="bold" color="#00ffff">NEXT</text>
+    </panel>
+  </panel>
+
+  <panel id="btn-skins-back" background="#222244" borderRadius={8} padding={8} paddingLeft={24} paddingRight={24}>
+    <text fontSize={14} color="#88aaaa">BACK</text>
+  </panel>
+</panel>

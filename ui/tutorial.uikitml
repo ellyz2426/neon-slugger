@@ -1,0 +1,32 @@
+<panel background="#000a1aee" borderRadius={16} padding={24} gap={16}>
+  <text fontSize={28} fontWeight="bold" color="#00ffff">WELCOME TO NEON SLUGGER</text>
+  <text fontSize={14} color="#88cccc">Your holodeck batting cage awaits</text>
+
+  <panel background="#001a2a88" borderRadius={8} padding={16} gap={10}>
+    <text fontSize={16} fontWeight="bold" color="#ff00ff">BROWSER CONTROLS</text>
+    <text fontSize={12} color="#aadddd">Mouse aim: Move left/right to position bat</text>
+    <text fontSize={12} color="#aadddd">Click + hold: Charge swing power</text>
+    <text fontSize={12} color="#aadddd">Release: Swing! Time it with the pitch</text>
+    <text fontSize={12} color="#aadddd">ESC: Pause game</text>
+  </panel>
+
+  <panel background="#001a2a88" borderRadius={8} padding={16} gap={10}>
+    <text fontSize={16} fontWeight="bold" color="#ff00ff">VR CONTROLS</text>
+    <text fontSize={12} color="#aadddd">Right trigger: Hold to charge, release to swing</text>
+    <text fontSize={12} color="#aadddd">Right thumbstick: Aim bat left/right</text>
+    <text fontSize={12} color="#aadddd">B button: Pause game</text>
+    <text fontSize={12} color="#aadddd">Laser pointer: Navigate menus</text>
+  </panel>
+
+  <panel background="#001a2a88" borderRadius={8} padding={16} gap={10}>
+    <text fontSize={16} fontWeight="bold" color="#ffd700">TIPS</text>
+    <text fontSize={12} color="#aadddd">Watch the pitch type — each moves differently</text>
+    <text fontSize={12} color="#aadddd">Build combos for score multipliers (x2, x3, x5, x10)</text>
+    <text fontSize={12} color="#aadddd">Collect power-ups that appear near the plate</text>
+    <text fontSize={12} color="#aadddd">Hit 100m+ for a HOME RUN!</text>
+  </panel>
+
+  <panel id="btn-tutorial-start" background="#00ffff" borderRadius={8} padding={12} paddingLeft={32} paddingRight={32}>
+    <text fontSize={18} fontWeight="bold" color="#000000">PLAY BALL!</text>
+  </panel>
+</panel>

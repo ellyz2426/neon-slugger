@@ -249,4 +249,25 @@ export class AudioManager {
   playCombo(level: number): void {
     this.playSfx(600 + level * 100, 'triangle', 0.15, 0.2);
   }
+
+  playPowerUp(): void {
+    const ctx = this.ensure();
+    // Rising shimmer
+    [660, 880, 1100, 1320].forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = f;
+      const g = ctx.createGain();
+      g.gain.value = 0;
+      g.gain.setValueAtTime(0, ctx.currentTime + i * 0.06);
+      g.gain.linearRampToValueAtTime(0.15 * this.sfxVol, ctx.currentTime + i * 0.06 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.06 + 0.18);
+      osc.connect(g);
+      g.connect(this.sfxGain!);
+      osc.start(ctx.currentTime + i * 0.06);
+      osc.stop(ctx.currentTime + i * 0.06 + 0.18);
+    });
+    // Sub pulse
+    this.playSfx(80, 'sine', 0.15, 0.2);
+  }
 }

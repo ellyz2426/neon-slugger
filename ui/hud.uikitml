@@ -41,6 +41,11 @@
     color: #00ff80;
     font-weight: bold;
   }
+  .hud-powerup {
+    font-size: 1.8;
+    color: #ff4400;
+    font-weight: bold;
+  }
 </style>
 <div class="hud-panel">
   <div class="hud-col">
@@ -58,5 +63,9 @@
   <div class="hud-col">
     <span class="hud-label">PITCHES</span>
     <span id="hud-pitches" class="hud-pitches">0/10</span>
+  </div>
+  <div class="hud-col">
+    <span class="hud-label">POWER-UP</span>
+    <span id="hud-powerup" class="hud-powerup"></span>
   </div>
 </div>

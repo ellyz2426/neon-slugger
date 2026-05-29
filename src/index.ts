@@ -13,6 +13,9 @@ import {
   GameStateManager, GameState, GameMode, Difficulty, PitchType, HitResult,
   PITCH_CONFIGS, PITCH_TYPES, DIFFICULTY_CONFIGS, THEMES, ACHIEVEMENTS,
   HIT_SCORES, HIT_COLORS, classifyHit,
+  BAT_SKINS, BatSkin,
+  PowerUpType, POWERUP_CONFIGS, POWERUP_TYPES,
+  CareerStats,
 } from './types';
 import { AudioManager } from './audio';
 
@@ -26,6 +29,9 @@ let themeIndex = 0;
 let pitchingMachine: Group;
 let bat: Group;
 let batMesh: Mesh;
+let batHandleMesh: Mesh;
+let batGlowMesh: Mesh;
+let batEdgesMesh: LineSegments;
 let currentBall: Group | null = null;
 let fieldGroup: Group;
 let environmentGroup: Group;
@@ -50,6 +56,15 @@ let countdownTimer = 0;
 let countdownValue = 3;
 let toastTimer = 0;
 let gameTimer = 0;
+
+// Power-up pickup in scene
+let powerUpGroup: Group | null = null;
+let powerUpBob = 0;
+let nextPowerUpPitch = 0; // spawn after this many pitches
+
+// XR controller state
+let prevTriggerPressed = false;
+let prevBPressed = false;
 
 // Daily seed
 function dailySeed(): number {
@@ -99,6 +114,13 @@ async function main() {
   setupUI();
   setupInput();
 
+  // Show tutorial on first launch
+  if (!gsm.tutorialShown) {
+    showUI('tutorial');
+  } else {
+    showUI('title');
+  }
+
   // Game loop
   let lastTime = performance.now();
   const loop = () => {
@@ -120,10 +142,8 @@ function buildEnvironment() {
 
 function applyTheme() {
   const theme = THEMES[themeIndex];
-  // Clear old
   while (environmentGroup.children.length > 0) environmentGroup.remove(environmentGroup.children[0]);
 
-  // Fog
   world.scene.fog = new Fog(theme.fog, 10, 200);
   world.scene.background = theme.fog;
 
@@ -242,9 +262,7 @@ function buildField() {
 
   // Distance markers at 20, 50, 75, 100, 120m
   const distances = [20, 50, 75, 100, 120];
-  const labels = ['20m', '50m', '75m', '100m', 'HR FENCE'];
   distances.forEach((d, i) => {
-    // Arc of posts
     for (let angle = -40; angle <= 40; angle += 20) {
       const rad = (angle * Math.PI) / 180;
       const x = Math.sin(rad) * d;
@@ -260,7 +278,6 @@ function buildField() {
       fieldGroup.add(post);
     }
 
-    // Home run fence at 100m
     if (d === 100) {
       const fenceGeo = new BufferGeometry();
       const fenceVerts: number[] = [];
@@ -283,8 +300,8 @@ function buildField() {
   // Foul lines
   const foulGeo = new BufferGeometry();
   const foulVerts = [
-    0, 0.02, 0, -120, 0.02, -120, // left foul
-    0, 0.02, 0, 120, 0.02, -120,  // right foul
+    0, 0.02, 0, -120, 0.02, -120,
+    0, 0.02, 0, 120, 0.02, -120,
   ];
   foulGeo.setAttribute('position', new Float32BufferAttribute(foulVerts, 3));
   const foulMat = new LineBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.2 });
@@ -302,13 +319,10 @@ function buildPitchingMachine() {
   pitchingMachine.position.set(0, 1.2, MOUND_Z);
   world.scene.add(pitchingMachine);
 
-  // Body
   const bodyGeo = new CylinderGeometry(0.4, 0.5, 1.2, 8);
   const bodyMat = new MeshStandardMaterial({ color: 0x222233, emissive: 0x00ffff, emissiveIntensity: 0.15 });
-  const body = new Mesh(bodyGeo, bodyMat);
-  pitchingMachine.add(body);
+  pitchingMachine.add(new Mesh(bodyGeo, bodyMat));
 
-  // Barrel
   const barrelGeo = new CylinderGeometry(0.15, 0.2, 0.8, 8);
   const barrelMat = new MeshStandardMaterial({ color: 0x333344, emissive: 0xff00ff, emissiveIntensity: 0.2 });
   const barrel = new Mesh(barrelGeo, barrelMat);
@@ -317,7 +331,6 @@ function buildPitchingMachine() {
   barrel.position.y = 0.2;
   pitchingMachine.add(barrel);
 
-  // Glow ring
   const ringGeo = new TorusGeometry(0.25, 0.03, 8, 16);
   const ringMat = new MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.6 });
   const ring = new Mesh(ringGeo, ringMat);
@@ -325,7 +338,6 @@ function buildPitchingMachine() {
   ring.position.y = 0.2;
   pitchingMachine.add(ring);
 
-  // Base
   const baseGeo = new CylinderGeometry(0.6, 0.6, 0.15, 8);
   const baseMat = new MeshStandardMaterial({ color: 0x111122, emissive: 0x00ffff, emissiveIntensity: 0.1 });
   const base = new Mesh(baseGeo, baseMat);
@@ -339,33 +351,152 @@ function buildBat() {
   bat.position.set(0.5, BAT_Y, 0);
   world.scene.add(bat);
 
+  const skin = BAT_SKINS[gsm.batSkinIndex] || BAT_SKINS[0];
+
   // Bat handle
   const handleGeo = new CylinderGeometry(0.025, 0.03, 0.5, 8);
-  const handleMat = new MeshStandardMaterial({ color: 0x443322, emissive: 0xff8800, emissiveIntensity: 0.1 });
-  const handle = new Mesh(handleGeo, handleMat);
-  handle.position.y = 0;
-  bat.add(handle);
+  const handleMat = new MeshStandardMaterial({ color: skin.handleColor, emissive: skin.glowColor, emissiveIntensity: 0.1 });
+  batHandleMesh = new Mesh(handleGeo, handleMat);
+  batHandleMesh.position.y = 0;
+  bat.add(batHandleMesh);
 
   // Bat barrel
   const barrelGeo = new CylinderGeometry(0.04, 0.03, 0.5, 8);
-  const barrelMat = new MeshStandardMaterial({ color: 0x00ffff, emissive: 0x00ffff, emissiveIntensity: 0.4 });
+  const barrelMat = new MeshStandardMaterial({ color: skin.barrelColor, emissive: skin.barrelColor, emissiveIntensity: skin.emissiveIntensity });
   batMesh = new Mesh(barrelGeo, barrelMat);
   batMesh.position.y = 0.5;
   bat.add(batMesh);
 
   // Glow sphere at bat tip
   const glowGeo = new SphereGeometry(0.06, 8, 8);
-  const glowMat = new MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.5 });
-  const glow = new Mesh(glowGeo, glowMat);
-  glow.position.y = 0.75;
-  bat.add(glow);
+  const glowMat = new MeshBasicMaterial({ color: skin.glowColor, transparent: true, opacity: 0.5 });
+  batGlowMesh = new Mesh(glowGeo, glowMat);
+  batGlowMesh.position.y = 0.75;
+  bat.add(batGlowMesh);
 
   // Edges for wireframe overlay
   const edgesGeo = new EdgesGeometry(barrelGeo);
-  const edgesMat = new LineBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.4 });
-  const edges = new LineSegments(edgesGeo, edgesMat);
-  edges.position.y = 0.5;
-  bat.add(edges);
+  const edgesMat = new LineBasicMaterial({ color: skin.glowColor, transparent: true, opacity: 0.4 });
+  batEdgesMesh = new LineSegments(edgesGeo, edgesMat);
+  batEdgesMesh.position.y = 0.5;
+  bat.add(batEdgesMesh);
+}
+
+function applyBatSkin() {
+  const skin = BAT_SKINS[gsm.batSkinIndex] || BAT_SKINS[0];
+  // Update handle
+  const hMat = batHandleMesh.material as MeshStandardMaterial;
+  hMat.color.setHex(skin.handleColor);
+  hMat.emissive.setHex(skin.glowColor);
+  // Update barrel
+  const bMat = batMesh.material as MeshStandardMaterial;
+  bMat.color.setHex(skin.barrelColor);
+  bMat.emissive.setHex(skin.barrelColor);
+  bMat.emissiveIntensity = skin.emissiveIntensity;
+  // Update glow
+  (batGlowMesh.material as MeshBasicMaterial).color.setHex(skin.glowColor);
+  // Update edges
+  (batEdgesMesh.material as LineBasicMaterial).color.setHex(skin.glowColor);
+}
+
+// ============ POWER-UPS ============
+function spawnPowerUpPickup() {
+  removePowerUpPickup();
+  const types = POWERUP_TYPES;
+  const type = types[Math.floor(Math.random() * types.length)];
+  const cfg = POWERUP_CONFIGS[type];
+
+  powerUpGroup = new Group();
+  (powerUpGroup as any)._type = type;
+  powerUpBob = 0;
+
+  // Floating orb
+  const orbGeo = new SphereGeometry(0.2, 12, 12);
+  const orbMat = new MeshStandardMaterial({ color: cfg.color, emissive: cfg.color, emissiveIntensity: 0.6, transparent: true, opacity: 0.8 });
+  powerUpGroup.add(new Mesh(orbGeo, orbMat));
+
+  // Ring
+  const ringGeo = new TorusGeometry(0.3, 0.02, 8, 16);
+  const ringMat = new MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: 0.4 });
+  const ring = new Mesh(ringGeo, ringMat);
+  ring.rotation.x = Math.PI / 2;
+  powerUpGroup.add(ring);
+
+  // Place near batting area
+  powerUpGroup.position.set(
+    (Math.random() - 0.5) * 1.5,
+    1.2 + Math.random() * 0.5,
+    -1 + Math.random(),
+  );
+  world.scene.add(powerUpGroup);
+}
+
+function removePowerUpPickup() {
+  if (powerUpGroup) {
+    world.scene.remove(powerUpGroup);
+    powerUpGroup = null;
+  }
+}
+
+function checkPowerUpCollection() {
+  if (!powerUpGroup || gsm.state !== 'playing') return;
+  // Auto-collect if bat swings near power-up
+  const dist = bat.position.distanceTo(powerUpGroup.position);
+  if (dist < 1.0) {
+    collectPowerUp();
+  }
+}
+
+function collectPowerUp() {
+  if (!powerUpGroup) return;
+  const type = (powerUpGroup as any)._type as PowerUpType;
+  const cfg = POWERUP_CONFIGS[type];
+
+  gsm.activePowerUp = type;
+  gsm.powerUpTimer = cfg.duration;
+  gsm.powerUpsCollectedThisGame++;
+
+  audio.playPowerUp();
+  showToast(cfg.name, cfg.desc);
+  spawnHitExplosion(powerUpGroup.position.clone(), cfg.color, 15);
+  removePowerUpPickup();
+
+  // Achievement check
+  checkPowerUpAchievements();
+}
+
+function updatePowerUp(dt: number) {
+  // Bob animation for pickup
+  if (powerUpGroup) {
+    powerUpBob += dt;
+    powerUpGroup.position.y += Math.sin(powerUpBob * 3) * 0.003;
+    powerUpGroup.rotation.y += dt * 2;
+    // Ring pulsing
+    if (powerUpGroup.children[1]) {
+      const ring = powerUpGroup.children[1] as Mesh;
+      const scale = 1 + Math.sin(powerUpBob * 4) * 0.15;
+      ring.scale.setScalar(scale);
+    }
+  }
+
+  // Duration power-ups (magnet)
+  if (gsm.activePowerUp && gsm.powerUpTimer > 0) {
+    gsm.powerUpTimer -= dt;
+    if (gsm.powerUpTimer <= 0) {
+      gsm.activePowerUp = null;
+      gsm.powerUpTimer = 0;
+    }
+  }
+}
+
+function checkPowerUpAchievements() {
+  const total = gsm.career.powerUpsCollected + gsm.powerUpsCollectedThisGame;
+  if (!gsm.unlockedAchievements.has('powerup_first')) {
+    unlockAchievement('powerup_first');
+  }
+  if (total >= 10 && !gsm.unlockedAchievements.has('powerup_10')) {
+    unlockAchievement('powerup_10');
+  }
 }
 
 // ============ BALL ============
@@ -386,24 +517,29 @@ function spawnBall() {
 
   const pitchCfg = PITCH_CONFIGS[currentPitch];
 
+  // Apply Time Freeze power-up: slow speed
+  let speedMult = diffConfig.speedMultiplier;
+  if (gsm.activePowerUp === 'time_freeze') {
+    speedMult *= 0.3;
+    gsm.activePowerUp = null; // single use
+    gsm.powerUpTimer = 0;
+    showToast('TIME FREEZE!', 'Slow pitch incoming');
+  }
+
   currentBall = new Group();
 
-  // Ball sphere
   const ballGeo = new SphereGeometry(0.037, 12, 12);
   const ballMat = new MeshStandardMaterial({
     color: pitchCfg.color,
     emissive: pitchCfg.color,
     emissiveIntensity: 0.6,
   });
-  const ballMesh = new Mesh(ballGeo, ballMat);
-  currentBall.add(ballMesh);
+  currentBall.add(new Mesh(ballGeo, ballMat));
 
-  // Glow
   const glowGeo = new SphereGeometry(0.06, 8, 8);
   const glowMat = new MeshBasicMaterial({ color: pitchCfg.color, transparent: true, opacity: 0.3 });
   currentBall.add(new Mesh(glowGeo, glowMat));
 
-  // Start position (at pitching machine barrel exit)
   const noise = diffConfig.accuracyNoise;
   ballPos.set(
     (Math.random() - 0.5) * noise,
@@ -412,11 +548,10 @@ function spawnBall() {
   );
   currentBall.position.copy(ballPos);
 
-  // Velocity toward home plate
-  const targetY = BAT_Y + (Math.random() - 0.5) * 0.4; // strike zone variation
+  const targetY = BAT_Y + (Math.random() - 0.5) * 0.4;
   const targetX = (Math.random() - 0.5) * 0.3;
   const dir = new Vector3(targetX - ballPos.x, targetY - ballPos.y, PLATE_Z - ballPos.z).normalize();
-  const speed = pitchCfg.speed * diffConfig.speedMultiplier;
+  const speed = pitchCfg.speed * speedMult;
   ballVel.copy(dir).multiplyScalar(speed);
 
   ballActive = true;
@@ -426,7 +561,13 @@ function spawnBall() {
   audio.playPitchThrow();
   gsm.pitchesThrown++;
 
-  // Update pitch info UI
+  // Maybe spawn power-up
+  nextPowerUpPitch--;
+  if (nextPowerUpPitch <= 0 && !powerUpGroup && gsm.mode !== 'daily') {
+    spawnPowerUpPickup();
+    nextPowerUpPitch = 4 + Math.floor(Math.random() * 4); // every 4-7 pitches
+  }
+
   updatePitchInfo();
 }
 
@@ -437,11 +578,21 @@ function updateBall(dt: number) {
   const pitchCfg = PITCH_CONFIGS[currentPitch];
 
   // Apply pitch-specific movement
-  ballVel.y += pitchCfg.spinY * dt; // gravity + drop
-  ballVel.x += pitchCfg.spinZ * dt; // lateral break
+  ballVel.y += pitchCfg.spinY * dt;
+  ballVel.x += pitchCfg.spinZ * dt;
   if (pitchCfg.wobble > 0) {
     ballVel.x += Math.sin(ballTime * 15) * pitchCfg.wobble * dt;
     ballVel.y += Math.cos(ballTime * 12) * pitchCfg.wobble * 0.5 * dt;
+  }
+
+  // Magnet power-up: curve ball toward bat
+  if (gsm.activePowerUp === 'magnet') {
+    const toBat = new Vector3(bat.position.x, BAT_Y, PLATE_Z).sub(ballPos);
+    const dist = toBat.length();
+    if (dist > 0.5 && dist < 5) {
+      toBat.normalize().multiplyScalar(2.0 * dt);
+      ballVel.add(toBat);
+    }
   }
 
   // Gravity
@@ -459,9 +610,8 @@ function updateBall(dt: number) {
     spawnParticle(ballPos.clone(), new Vector3((Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5, 0), pitchCfg.color, 0.3);
   }
 
-  // Check if ball passed the plate (miss or already hit)
+  // Check if ball passed the plate (miss)
   if (ballPos.z > 2) {
-    // Missed!
     onMiss();
   }
 
@@ -484,52 +634,54 @@ function attemptSwing() {
   if (!ballActive || swingCooldown > 0) return;
 
   audio.playSwing();
-  batSwingAnim = 1.0; // trigger swing animation
+  batSwingAnim = 1.0;
   swingCooldown = 0.5;
 
-  // Check if ball is in the strike zone (near the plate)
   const distToPlate = Math.abs(ballPos.z - PLATE_Z);
   const distToBat = ballPos.distanceTo(new Vector3(bat.position.x, BAT_Y, PLATE_Z));
 
   if (distToPlate < 1.5 && distToBat < 1.2) {
     // HIT!
     const power = Math.max(0.3, swingPower);
-    const contactQuality = 1.0 - (distToBat / 1.2); // 0-1, better = closer to sweet spot
+    const contactQuality = 1.0 - (distToBat / 1.2);
 
-    // Calculate launch angle and direction
-    const launchAngle = 15 + power * 25 + (Math.random() - 0.5) * 15; // 15-55 degrees
-    const launchDir = swingAngle + (Math.random() - 0.5) * 20; // horizontal deviation
-    const launchSpeed = power * contactQuality * 60; // meters
+    let launchAngle = 15 + power * 25 + (Math.random() - 0.5) * 15;
+    let launchDir = swingAngle + (Math.random() - 0.5) * 20;
+    let launchSpeed = power * contactQuality * 60;
 
-    // Calculate distance (simplified parabolic approximation)
+    // Power Swing power-up: 2x distance
+    if (gsm.activePowerUp === 'power_swing') {
+      launchSpeed *= 1.6;
+      gsm.activePowerUp = null;
+      gsm.powerUpTimer = 0;
+    }
+
     const radAngle = (launchAngle * Math.PI) / 180;
     const distance = (launchSpeed * launchSpeed * Math.sin(2 * radAngle)) / 9.81;
 
-    // Classify hit
     const result = classifyHit(distance, launchDir);
 
-    // Send ball flying
     const radDir = (launchDir * Math.PI) / 180;
     ballVel.set(
       Math.sin(radDir) * launchSpeed * 0.3,
       Math.sin(radAngle) * launchSpeed,
       -Math.cos(radDir) * launchSpeed * 0.3,
     );
-    ballActive = true; // keep ball moving for visual
+    ballActive = true;
 
-    // Remove ball after a short delay
     setTimeout(() => removeBall(), 2000);
 
     onHit(result, distance, launchDir);
   }
-  // If not close enough, it's a swing-and-miss — ball continues naturally
 }
 
 function onHit(result: HitResult, distance: number, angle: number) {
+  gsm.totalDistanceThisGame += Math.max(0, distance);
+
   if (result === 'foul') {
     gsm.combo = 0;
     audio.playFoul();
-    gsm.hits++; // fouls count as contact
+    gsm.hits++;
     const points = HIT_SCORES[result];
     gsm.score += points;
     showToast('FOUL BALL', `${Math.round(distance)}m`);
@@ -545,9 +697,11 @@ function onHit(result: HitResult, distance: number, angle: number) {
 
     if (result === 'homerun' || result === 'grandslam') {
       gsm.homeRuns++;
+      if (result === 'grandslam') gsm.grandSlams++;
       audio.playHomeRun();
       spawnHitExplosion(ballPos.clone(), HIT_COLORS[result], 25);
     } else {
+      if (result === 'triple') gsm.triples++;
       audio.playHit(distance / 100);
       spawnHitExplosion(ballPos.clone(), HIT_COLORS[result], 12);
     }
@@ -557,13 +711,14 @@ function onHit(result: HitResult, distance: number, angle: number) {
     const resultName = result.toUpperCase().replace('HOMERUN', 'HOME RUN').replace('GRANDSLAM', 'GRAND SLAM');
     showToast(`${resultName}!`, `${Math.round(distance)}m  x${multiplier}`);
 
-    // Track pitch type hits
     if (currentPitch === 'curveball') gsm.curvesHit++;
     if (currentPitch === 'knuckleball') gsm.knucklesHit++;
 
-    // Check achievements
     checkAchievements(result, distance);
   }
+
+  // Auto-collect nearby power-up on hit
+  checkPowerUpCollection();
 
   gsm.pitchesRemaining--;
   updateHUD();
@@ -597,6 +752,8 @@ function startGame() {
   gsm.state = 'countdown';
   countdownValue = 3;
   countdownTimer = 0;
+  nextPowerUpPitch = 3 + Math.floor(Math.random() * 3); // first power-up after 3-5 pitches
+  removePowerUpPickup();
   showUI('countdown');
   updateCountdown();
 }
@@ -606,7 +763,7 @@ function beginPlaying() {
   hideUI('countdown');
   showUI('hud');
   showUI('pitchinfo');
-  pitchTimer = 1.5; // first pitch delay
+  pitchTimer = 1.5;
   audio.playGameStart();
   updateHUD();
 }
@@ -614,8 +771,11 @@ function beginPlaying() {
 function endGame() {
   gsm.state = 'gameover';
   removeBall();
+  removePowerUpPickup();
   audio.playGameOver();
+  gsm.updateCareerOnGameEnd();
   gsm.addToLeaderboard();
+  checkCareerAchievements();
   updateGameOver();
   showUI('gameover');
   hideUI('hud');
@@ -634,6 +794,8 @@ function update(dt: number) {
   updateEnvironmentAnimations(dt);
   updateParticles(dt);
   updateBatAnimation(dt);
+  updatePowerUp(dt);
+  updateXRInput();
 
   if (swingCooldown > 0) swingCooldown -= dt;
 
@@ -653,7 +815,6 @@ function update(dt: number) {
       break;
 
     case 'playing':
-      // Speed mode timer
       if (gsm.mode === 'speed') {
         gsm.timeRemaining -= dt;
         if (gsm.timeRemaining <= 0) {
@@ -663,14 +824,12 @@ function update(dt: number) {
         }
       }
 
-      // Pitch timer
       if (!ballActive) {
         pitchTimer -= dt;
         if (pitchTimer <= 0 && !shouldEndGame()) {
           spawnBall();
           pitchTimer = DIFFICULTY_CONFIGS[gsm.difficulty].pitchInterval;
         } else if (shouldEndGame() && !ballActive) {
-          // Check if it's end of round for classic mode
           if (gsm.mode === 'classic' && gsm.round < gsm.maxRounds) {
             gsm.round++;
             gsm.pitchesRemaining = 10;
@@ -685,13 +844,10 @@ function update(dt: number) {
 
       updateBall(dt);
       updateHUD();
-
-      // Mouse-based bat tracking (browser mode)
       updateBatTracking();
       break;
   }
 
-  // Toast timer
   if (toastTimer > 0) {
     toastTimer -= dt;
     if (toastTimer <= 0) hideUI('toast');
@@ -728,18 +884,78 @@ function updateBatAnimation(dt: number) {
     }
   }
 
-  // Charging visual
   if (swingCharging) {
     swingPower = Math.min(1.0, swingPower + dt * 1.2);
-    // Bat glow based on charge
-    (batMesh.material as MeshStandardMaterial).emissiveIntensity = 0.4 + swingPower * 0.8;
+    (batMesh.material as MeshStandardMaterial).emissiveIntensity =
+      (BAT_SKINS[gsm.batSkinIndex]?.emissiveIntensity || 0.4) + swingPower * 0.8;
   }
 }
 
 function updateBatTracking() {
-  // In browser mode, bat follows mouse X somewhat
-  // This is handled by input events moving swingAngle
   bat.position.x = 0.5 + swingAngle * 0.01;
+}
+
+// ============ XR CONTROLLER INPUT ============
+function updateXRInput() {
+  // Poll XR gamepads for controller input
+  const session = (world as any).renderer?.xr?.getSession?.();
+  if (!session) return;
+  const sources = session.inputSources;
+  if (!sources) return;
+
+  for (let i = 0; i < sources.length; i++) {
+    const source = sources[i];
+    if (!source.gamepad) continue;
+    const gp = source.gamepad;
+    const hand = source.handedness;
+
+    // Right hand — primary interaction
+    if (hand === 'right' && gp.buttons.length > 0) {
+      // Trigger (index 0): charge/release swing
+      const triggerPressed = gp.buttons[0].pressed;
+      if (triggerPressed && !prevTriggerPressed) {
+        // Trigger pressed: start charging
+        if (gsm.state === 'playing') {
+          swingCharging = true;
+          swingPower = 0;
+        }
+      } else if (!triggerPressed && prevTriggerPressed) {
+        // Trigger released: swing
+        if (gsm.state === 'playing' && swingCharging) {
+          swingCharging = false;
+          attemptSwing();
+          const skin = BAT_SKINS[gsm.batSkinIndex] || BAT_SKINS[0];
+          (batMesh.material as MeshStandardMaterial).emissiveIntensity = skin.emissiveIntensity;
+        }
+      }
+      prevTriggerPressed = triggerPressed;
+
+      // B button (index 4 on Quest): pause/resume
+      if (gp.buttons.length > 4) {
+        const bPressed = gp.buttons[4].pressed;
+        if (bPressed && !prevBPressed) {
+          if (gsm.state === 'playing') {
+            gsm.state = 'paused';
+            showUI('pause');
+            hideUI('hud');
+          } else if (gsm.state === 'paused') {
+            gsm.state = 'playing';
+            hideUI('pause');
+            showUI('hud');
+          }
+        }
+        prevBPressed = bPressed;
+      }
+
+      // Thumbstick horizontal (axis 2 or 3): bat aim
+      if (gp.axes.length > 2) {
+        const thumbX = gp.axes[2];
+        if (gsm.state === 'playing' && Math.abs(thumbX) > 0.1) {
+          swingAngle = thumbX * 30; // -30 to +30 degrees
+        }
+      }
+    }
+  }
 }
 
 // ============ PARTICLES ============
@@ -771,7 +987,7 @@ function updateParticles(dt: number) {
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
     p.life -= dt;
-    p.vel.y -= 6 * dt; // gravity
+    p.vel.y -= 6 * dt;
     p.mesh.position.add(p.vel.clone().multiplyScalar(dt));
     (p.mesh.material as MeshBasicMaterial).opacity = Math.max(0, p.life * 0.8);
     p.mesh.scale.setScalar(Math.max(0.1, p.life));
@@ -783,41 +999,55 @@ function updateParticles(dt: number) {
 }
 
 // ============ ACHIEVEMENTS ============
-function checkAchievements(result: HitResult, distance: number) {
-  const unlock = (id: string) => {
-    if (!gsm.unlockedAchievements.has(id)) {
-      gsm.unlockedAchievements.add(id);
-      gsm.savePersistence();
-      audio.playAchievement();
-      const ach = ACHIEVEMENTS.find(a => a.id === id);
-      if (ach) showToast(`ACHIEVEMENT: ${ach.name}`, ach.desc);
-    }
-  };
+function unlockAchievement(id: string) {
+  if (gsm.unlockedAchievements.has(id)) return;
+  gsm.unlockedAchievements.add(id);
+  gsm.savePersistence();
+  audio.playAchievement();
+  const ach = ACHIEVEMENTS.find(a => a.id === id);
+  if (ach) showToast(`ACHIEVEMENT: ${ach.name}`, ach.desc);
 
-  if (result !== 'miss') unlock('first_hit');
-  if (result === 'homerun' || result === 'grandslam') unlock('first_hr');
-  if (result === 'grandslam') unlock('grand_slam');
-  if (gsm.combo >= 5) unlock('combo_5');
-  if (gsm.combo >= 10) unlock('combo_10');
-  if (gsm.score >= 1000) unlock('score_1k');
-  if (gsm.score >= 5000) unlock('score_5k');
-  if (gsm.score >= 10000) unlock('score_10k');
-  if (gsm.homeRuns >= 5 && gsm.mode === 'derby') unlock('derby_champ');
-  if (gsm.hits >= 15 && gsm.mode === 'speed') unlock('speed_demon');
-  if (gsm.combo >= 10) unlock('streak_10');
-  if (gsm.combo >= 20) unlock('streak_20');
-  if (gsm.mode === 'daily') unlock('daily_done');
-  if (gsm.difficulty === 'hard') unlock('hard_mode');
-  if (gsm.curvesHit >= 10) unlock('curve_master');
-  if (currentPitch === 'knuckleball' && result !== 'miss') unlock('knuckle_hit');
-  if (distance >= 150) unlock('distance_150');
-  if (gsm.modesPlayed.size >= 6) unlock('all_modes');
+  // Check if this unlocked a bat skin
+  const unlockedSkin = BAT_SKINS.find(s => s.requiresAchievement === id);
+  if (unlockedSkin && !gsm.unlockedAchievements.has('skin_unlock')) {
+    unlockAchievement('skin_unlock');
+  }
+}
+
+function checkAchievements(result: HitResult, distance: number) {
+  if (result !== 'miss') unlockAchievement('first_hit');
+  if (result === 'homerun' || result === 'grandslam') unlockAchievement('first_hr');
+  if (result === 'grandslam') unlockAchievement('grand_slam');
+  if (gsm.combo >= 5) unlockAchievement('combo_5');
+  if (gsm.combo >= 10) unlockAchievement('combo_10');
+  if (gsm.score >= 1000) unlockAchievement('score_1k');
+  if (gsm.score >= 5000) unlockAchievement('score_5k');
+  if (gsm.score >= 10000) unlockAchievement('score_10k');
+  if (gsm.homeRuns >= 5 && gsm.mode === 'derby') unlockAchievement('derby_champ');
+  if (gsm.hits >= 15 && gsm.mode === 'speed') unlockAchievement('speed_demon');
+  if (gsm.combo >= 10) unlockAchievement('streak_10');
+  if (gsm.combo >= 20) unlockAchievement('streak_20');
+  if (gsm.mode === 'daily') unlockAchievement('daily_done');
+  if (gsm.difficulty === 'hard') unlockAchievement('hard_mode');
+  if (gsm.curvesHit >= 10) unlockAchievement('curve_master');
+  if (currentPitch === 'knuckleball' && result !== 'miss') unlockAchievement('knuckle_hit');
+  if (distance >= 150) unlockAchievement('distance_150');
+  if (gsm.modesPlayed.size >= 6) unlockAchievement('all_modes');
+  if (gsm.triples >= 3) unlockAchievement('triple_play');
+}
+
+function checkCareerAchievements() {
+  if (gsm.career.totalHits >= 100) unlockAchievement('career_100_hits');
+  if (gsm.career.totalHomeRuns >= 50) unlockAchievement('career_50_hr');
+  if (gsm.career.totalDistance >= 1000) unlockAchievement('career_1000_dist');
+  if (gsm.career.gamesPlayed >= 10) unlockAchievement('games_10');
+  if (gsm.career.gamesPlayed >= 50) unlockAchievement('games_50');
+  if (gsm.career.perfectRounds >= 3) unlockAchievement('perfect_3');
 }
 
 // ============ INPUT ============
 function setupInput() {
-  // Mouse / keyboard
-  window.addEventListener('mousedown', (e) => {
+  window.addEventListener('mousedown', () => {
     if (gsm.state === 'playing') {
       swingCharging = true;
       swingPower = 0;
@@ -828,15 +1058,15 @@ function setupInput() {
     if (gsm.state === 'playing' && swingCharging) {
       swingCharging = false;
       attemptSwing();
-      (batMesh.material as MeshStandardMaterial).emissiveIntensity = 0.4;
+      const skin = BAT_SKINS[gsm.batSkinIndex] || BAT_SKINS[0];
+      (batMesh.material as MeshStandardMaterial).emissiveIntensity = skin.emissiveIntensity;
     }
   });
 
   window.addEventListener('mousemove', (e) => {
     if (gsm.state === 'playing') {
-      // Aim angle based on mouse X position
       const centerX = window.innerWidth / 2;
-      swingAngle = ((e.clientX - centerX) / centerX) * 30; // -30 to +30 degrees
+      swingAngle = ((e.clientX - centerX) / centerX) * 30;
     }
   });
 
@@ -857,36 +1087,25 @@ function setupInput() {
 
 // ============ UI MANAGEMENT ============
 function setupUI() {
-  // Title
+  // World panels
   createWorldPanel('title', '/ui/title.json', 0.9, 1.2, new Vector3(0, 1.5, -3));
-  // Difficulty
   createWorldPanel('difficulty', '/ui/difficulty.json', 0.7, 0.8, new Vector3(0, 1.5, -3));
-  // Game over
   createWorldPanel('gameover', '/ui/gameover.json', 0.8, 0.9, new Vector3(0, 1.5, -3));
-  // Pause
   createWorldPanel('pause', '/ui/pause.json', 0.6, 0.5, new Vector3(0, 1.5, -2));
-  // Leaderboard
   createWorldPanel('leaderboard', '/ui/leaderboard.json', 0.85, 1.1, new Vector3(0, 1.5, -3));
-  // Achievements
   createWorldPanel('achievements', '/ui/achievements.json', 0.85, 1.4, new Vector3(0, 1.5, -3));
-  // Settings
   createWorldPanel('settings', '/ui/settings.json', 0.7, 0.9, new Vector3(0, 1.5, -3));
-  // Help
   createWorldPanel('help', '/ui/help.json', 0.8, 1.2, new Vector3(0, 1.5, -3));
+  createWorldPanel('tutorial', '/ui/tutorial.json', 0.85, 1.0, new Vector3(0, 1.5, -3));
+  createWorldPanel('batskins', '/ui/batskins.json', 0.8, 1.0, new Vector3(0, 1.5, -3));
+  createWorldPanel('career', '/ui/career.json', 0.75, 0.9, new Vector3(0, 1.5, -3));
 
-  // HUD (head-following)
+  // Head-following panels
   createFollowerPanel('hud', '/ui/hud.json', 0.35, 0.1, [0, 0.12, -0.5]);
-  // Toast (head-following)
   createFollowerPanel('toast', '/ui/toast.json', 0.25, 0.08, [0, -0.05, -0.5]);
-  // Countdown (head-following)
   createFollowerPanel('countdown', '/ui/countdown.json', 0.2, 0.15, [0, 0, -0.5]);
-  // Pitch info (head-following)
   createFollowerPanel('pitchinfo', '/ui/pitchinfo.json', 0.15, 0.07, [-0.2, 0.1, -0.5]);
 
-  // Start showing title
-  showUI('title');
-
-  // Setup button listeners after a delay (wait for PanelUI to render)
   setTimeout(setupUIListeners, 500);
 }
 
@@ -960,6 +1179,8 @@ function setupUIListeners() {
       bind('btn-achievements', () => { hideAllUI(); updateAchievements(); showUI('achievements'); });
       bind('btn-settings', () => { hideAllUI(); updateSettings(); showUI('settings'); });
       bind('btn-help', () => { hideAllUI(); showUI('help'); });
+      bind('btn-career', () => { hideAllUI(); updateCareer(); showUI('career'); });
+      bind('btn-batskins', () => { hideAllUI(); updateBatSkins(); showUI('batskins'); });
     }
 
     // Difficulty buttons
@@ -997,21 +1218,64 @@ function setupUIListeners() {
       bind('btn-title', () => { gsm.state = 'title'; hideAllUI(); showUI('title'); });
     }
 
-    // Back buttons
-    const lbDoc = getDoc('leaderboard');
-    if (lbDoc) {
-      const el = lbDoc.getElementById('btn-lb-back');
-      if (el) el.addEventListener('click', () => { audio.playButtonClick(); hideAllUI(); showUI('title'); });
+    // Back buttons for sub-screens
+    const backBind = (panelName: string, btnId: string) => {
+      const doc = getDoc(panelName);
+      if (doc) {
+        const el = doc.getElementById(btnId);
+        if (el) el.addEventListener('click', () => { audio.playButtonClick(); hideAllUI(); showUI('title'); });
+      }
+    };
+    backBind('leaderboard', 'btn-lb-back');
+    backBind('achievements', 'btn-ach-back');
+    backBind('help', 'btn-help-back');
+    backBind('career', 'btn-career-back');
+    backBind('batskins', 'btn-skins-back');
+
+    // Tutorial
+    const tutDoc = getDoc('tutorial');
+    if (tutDoc) {
+      const el = tutDoc.getElementById('btn-tutorial-start');
+      if (el) el.addEventListener('click', () => {
+        audio.playButtonClick();
+        gsm.tutorialShown = true;
+        gsm.savePersistence();
+        hideAllUI();
+        showUI('title');
+      });
     }
-    const achDoc = getDoc('achievements');
-    if (achDoc) {
-      const el = achDoc.getElementById('btn-ach-back');
-      if (el) el.addEventListener('click', () => { audio.playButtonClick(); hideAllUI(); showUI('title'); });
-    }
-    const helpDoc = getDoc('help');
-    if (helpDoc) {
-      const el = helpDoc.getElementById('btn-help-back');
-      if (el) el.addEventListener('click', () => { audio.playButtonClick(); hideAllUI(); showUI('title'); });
+
+    // Bat skins navigation
+    const skinsDoc = getDoc('batskins');
+    if (skinsDoc) {
+      const prevBtn = skinsDoc.getElementById('btn-skin-prev');
+      const nextBtn = skinsDoc.getElementById('btn-skin-next');
+      const selectBtn = skinsDoc.getElementById('btn-skin-select');
+      if (prevBtn) prevBtn.addEventListener('click', () => {
+        audio.playButtonClick();
+        gsm.batSkinIndex = (gsm.batSkinIndex - 1 + BAT_SKINS.length) % BAT_SKINS.length;
+        applyBatSkin();
+        gsm.savePersistence();
+        updateBatSkins();
+      });
+      if (nextBtn) nextBtn.addEventListener('click', () => {
+        audio.playButtonClick();
+        gsm.batSkinIndex = (gsm.batSkinIndex + 1) % BAT_SKINS.length;
+        applyBatSkin();
+        gsm.savePersistence();
+        updateBatSkins();
+      });
+      if (selectBtn) selectBtn.addEventListener('click', () => {
+        audio.playButtonClick();
+        const skin = BAT_SKINS[gsm.batSkinIndex];
+        if (gsm.isBatSkinUnlocked(skin)) {
+          applyBatSkin();
+          gsm.savePersistence();
+          showToast('BAT EQUIPPED', skin.name);
+        } else {
+          showToast('LOCKED', `Unlock: ${skin.requiresAchievement}`);
+        }
+      });
     }
 
     // Settings
@@ -1020,7 +1284,6 @@ function setupUIListeners() {
       const el = setDoc.getElementById('btn-settings-back');
       if (el) el.addEventListener('click', () => { audio.playButtonClick(); hideAllUI(); showUI('title'); });
 
-      // Volume controls
       const volBind = (btnId: string, getter: () => number, setter: (v: number) => void, displayId: string, delta: number) => {
         const btn = setDoc.getElementById(btnId);
         if (btn) btn.addEventListener('click', () => {
@@ -1037,7 +1300,6 @@ function setupUIListeners() {
       volBind('btn-music-down', () => audio.getMusicVolume(), v => audio.setMusicVolume(v), 'vol-music', -0.1);
       volBind('btn-music-up', () => audio.getMusicVolume(), v => audio.setMusicVolume(v), 'vol-music', 0.1);
 
-      // Theme cycling
       const prevBtn = setDoc.getElementById('btn-theme-prev');
       const nextBtn = setDoc.getElementById('btn-theme-next');
       if (prevBtn) prevBtn.addEventListener('click', () => {
@@ -1056,7 +1318,6 @@ function setupUIListeners() {
   };
 
   trySetup();
-  // Retry in case panels haven't loaded yet
   setTimeout(trySetup, 1000);
   setTimeout(trySetup, 2000);
 }
@@ -1078,6 +1339,14 @@ function updateHUD() {
   } else {
     setText(doc, 'hud-pitches', `${gsm.pitchesRemaining}/${gsm.mode === 'classic' ? 10 : gsm.pitchesRemaining + gsm.pitchesThrown}`);
   }
+
+  // Power-up indicator
+  if (gsm.activePowerUp) {
+    const cfg = POWERUP_CONFIGS[gsm.activePowerUp];
+    setText(doc, 'hud-powerup', cfg.name);
+  } else {
+    setText(doc, 'hud-powerup', '');
+  }
 }
 
 function updateCountdown() {
@@ -1097,7 +1366,7 @@ function updateGameOver() {
   const doc = getDoc('gameover');
   if (!doc) return;
   const accuracy = gsm.getAccuracy();
-  setText(doc, 'go-result', gsm.score > 0 ? 'GAME OVER' : 'GAME OVER');
+  setText(doc, 'go-result', 'GAME OVER');
   setText(doc, 'go-mode', gsm.mode.toUpperCase());
   setText(doc, 'go-score', `${gsm.score}`);
   setText(doc, 'go-hits', `${gsm.hits}`);
@@ -1105,21 +1374,12 @@ function updateGameOver() {
   setText(doc, 'go-best', `${Math.round(gsm.bestDistance)}m`);
   setText(doc, 'go-homers', `${gsm.homeRuns}`);
 
-  // Check perfect round achievement
-  if (gsm.pitchesThrown > 0 && gsm.misses === 0) {
-    checkAchievements('single' as HitResult, 0); // triggers perfect_round check indirectly
-    if (!gsm.unlockedAchievements.has('perfect_round') && gsm.misses === 0 && gsm.hits === gsm.pitchesThrown) {
-      gsm.unlockedAchievements.add('perfect_round');
-      gsm.savePersistence();
-      audio.playAchievement();
-    }
+  // Perfect round checks
+  if (gsm.pitchesThrown > 0 && gsm.misses === 0 && gsm.hits === gsm.pitchesThrown) {
+    unlockAchievement('perfect_round');
   }
   if (accuracy >= 90 && gsm.pitchesThrown >= 5) {
-    if (!gsm.unlockedAchievements.has('accuracy_90')) {
-      gsm.unlockedAchievements.add('accuracy_90');
-      gsm.savePersistence();
-      audio.playAchievement();
-    }
+    unlockAchievement('accuracy_90');
   }
 }
 
@@ -1171,7 +1431,7 @@ function updatePitchInfo() {
   const doc = getDoc('pitchinfo');
   if (!doc) return;
   const cfg = PITCH_CONFIGS[currentPitch];
-  const speed = Math.round(cfg.speed * DIFFICULTY_CONFIGS[gsm.difficulty].speedMultiplier * 2.237); // m/s to mph approx
+  const speed = Math.round(cfg.speed * DIFFICULTY_CONFIGS[gsm.difficulty].speedMultiplier * 2.237);
   setText(doc, 'pitch-type', cfg.name);
   setText(doc, 'pitch-speed', `${speed} MPH`);
 }
@@ -1186,10 +1446,30 @@ function showToast(text: string, sub: string) {
   }
 }
 
-// ============ VR INPUT ============
-// XR controller handling is done via the ECS update loop checking gamepads
-function setupXRInput() {
-  // This will be checked each frame in the update loop
+function updateCareer() {
+  const doc = getDoc('career');
+  if (!doc) return;
+  const c = gsm.career;
+  setText(doc, 'career-games', `${c.gamesPlayed}`);
+  setText(doc, 'career-hits', `${c.totalHits}`);
+  setText(doc, 'career-hrs', `${c.totalHomeRuns}`);
+  setText(doc, 'career-slams', `${c.totalGrandSlams}`);
+  setText(doc, 'career-distance', `${Math.round(c.totalDistance)}m`);
+  setText(doc, 'career-best-score', `${c.bestScore}`);
+  setText(doc, 'career-best-combo', `${c.bestCombo}`);
+  setText(doc, 'career-best-dist', `${Math.round(c.bestDistance)}m`);
+  setText(doc, 'career-powerups', `${c.powerUpsCollected}`);
+  setText(doc, 'career-perfects', `${c.perfectRounds}`);
+}
+
+function updateBatSkins() {
+  const doc = getDoc('batskins');
+  if (!doc) return;
+  const skin = BAT_SKINS[gsm.batSkinIndex];
+  const unlocked = gsm.isBatSkinUnlocked(skin);
+  setText(doc, 'skin-name', skin.name);
+  setText(doc, 'skin-status', unlocked ? 'UNLOCKED' : `LOCKED (${skin.requiresAchievement})`);
+  setText(doc, 'skin-index', `${gsm.batSkinIndex + 1} / ${BAT_SKINS.length}`);
 }
 
 // ============ ENTRY ============
